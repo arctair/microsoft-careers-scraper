@@ -1,5 +1,5 @@
 import express from 'express'
-import { post, State } from './state'
+import { index, State } from './state'
 
 const app = express()
 app.use(express.json())
@@ -11,7 +11,7 @@ app.get('/', function (_, response) {
 })
 
 app.post('/', function (request, response) {
-  state = post(state, request.body)
+  state = index(state, request.body)
   response.json(state)
 })
 

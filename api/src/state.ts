@@ -1,4 +1,4 @@
-export function post(state: State, payload: SearchPayload): State {
+export function index(state: State, payload: SearchPayload): State {
   return {
     jobs: payload.eagerLoadRefineSearch.data.jobs.reduce(
       (acc, cur) => Object.assign(acc, { [cur.jobId]: cur }),
