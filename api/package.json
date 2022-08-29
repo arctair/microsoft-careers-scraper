@@ -1,0 +1,23 @@
+{
+  "name": "microsoft-careers-scraper.api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/arctair/microsoft-careers-scraper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arctair/microsoft-careers-scraper/issues"
+  },
+  "homepage": "https://github.com/arctair/microsoft-careers-scraper#readme",
+  "dependencies": {
+    "@types/node": "^18.7.13",
+    "typescript": "^4.8.2"
+  }
+}
