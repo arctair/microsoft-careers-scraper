@@ -1,18 +1,21 @@
 import express from 'express'
-import { index, State } from './state'
+import { index, JobHistory, JobState, updateHistory } from './state'
 
 const app = express()
-app.use(express.json())
+app.use(express.json({ limit: '4mb' }))
 
-let state: State = { jobs: {} }
+let state: JobState = { jobs: {} }
+let history: JobHistory = { entries: [] }
 
 app.get('/', function (_, response) {
-  response.json(state)
+  response.json({ history, state })
 })
 
 app.post('/', function (request, response) {
+  const previous = state
   state = index(state, request.body)
-  response.json(state)
+  history = updateHistory(history, previous, state)
+  response.json({ history, state })
 })
 
 const port = process.env.PORT || 8080

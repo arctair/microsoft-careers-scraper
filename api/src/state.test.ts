@@ -1,4 +1,4 @@
-import { index, State } from './state'
+import { index, JobHistory, JobState, updateHistory } from './state'
 
 const {
   dummyJob1,
@@ -23,7 +23,7 @@ describe('index', () => {
       { jobs: {} },
       { eagerLoadRefineSearch: { data: { jobs: [dummyJob1] } } },
     )
-    const expected: State = { jobs: { [dummyJob1.jobId]: dummyJob1 } }
+    const expected: JobState = { jobs: { [dummyJob1.jobId]: dummyJob1 } }
     expect(actual).toStrictEqual(expected)
   })
 
@@ -41,12 +41,59 @@ describe('index', () => {
         },
       },
     )
-    const expected: State = {
+    const expected: JobState = {
       jobs: {
         [dummyJob1.jobId]: dummyJob1,
         [updatedDummyJob2.jobId]: updatedDummyJob2,
         [dummyJob3.jobId]: dummyJob3,
       },
+    }
+    expect(actual).toStrictEqual(expected)
+  })
+})
+
+describe('update history', () => {
+  test('add new to empty', () => {
+    const actual = updateHistory(
+      { entries: [] },
+      { jobs: {} },
+      { jobs: { [dummyJob1.jobId]: dummyJob1 } },
+    )
+    const expected: JobHistory = {
+      entries: [{ type: 'add', job: dummyJob1 }],
+    }
+    expect(actual).toStrictEqual(expected)
+  })
+  test('update existing', () => {
+    const actual = updateHistory(
+      { entries: [{ type: 'add', job: dummyJob2 }] },
+      { jobs: { [dummyJob2.jobId]: dummyJob2 } },
+      {
+        jobs: {
+          [updatedDummyJob2.jobId]: updatedDummyJob2,
+        },
+      },
+    )
+    const expected: JobHistory = {
+      entries: [
+        { type: 'add', job: dummyJob2 },
+        { type: 'update', job: updatedDummyJob2 },
+      ],
+    }
+    expect(actual).toStrictEqual(expected)
+  })
+  test('no change to existing', () => {
+    const actual = updateHistory(
+      { entries: [{ type: 'add', job: dummyJob2 }] },
+      { jobs: { [dummyJob2.jobId]: dummyJob2 } },
+      {
+        jobs: {
+          [dummyJob2.jobId]: dummyJob2,
+        },
+      },
+    )
+    const expected: JobHistory = {
+      entries: [{ type: 'add', job: dummyJob2 }],
     }
     expect(actual).toStrictEqual(expected)
   })
