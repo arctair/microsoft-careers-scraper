@@ -24,7 +24,6 @@ function get(offset: number) {
     {
       params: new URLSearchParams({
         from: offset.toString(),
-        rk: 'l-l-seattlearea',
         s: '1',
       }),
     },
