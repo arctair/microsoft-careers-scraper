@@ -1,42 +1,67 @@
 import { Database } from 'sqlite3'
 import { JobHistory, JobState } from './state'
 
-export function initialize(database: Database) {
-  return new Promise<void>((resolve, reject) =>
+export async function initialize(database: Database) {
+  await new Promise<void>((resolve, reject) =>
     database.run(
       'create table if not exists history (entry TEXT)',
       (error) => (error ? reject(error) : resolve()),
     ),
   )
-}
-
-export function load(database: Database) {
-  return new Promise<{ state: JobState; history: JobHistory }>(
-    (resolve, reject) => {
-      let state: JobState = { jobs: {} }
-      let history: JobHistory = { entries: [] }
-      database.each(
-        'select entry from history',
-        (error, { entry: entryAsString }) => {
-          if (error) reject(error)
-          else {
-            const entry = JSON.parse(entryAsString)
-            state.jobs[entry.job.jobId] = entry.job
-            history.entries.push(entry)
-          }
-        },
-        () => resolve({ state, history }),
-      )
-    },
+  await new Promise<void>((resolve, reject) =>
+    database.run('create table if not exists jobs (job TEXT)', (error) =>
+      error ? reject(error) : resolve(),
+    ),
   )
 }
 
-export function save(database: Database, newHistory: JobHistory) {
-  return new Promise<void>((resolve, reject) => {
-    const statement = database.prepare('INSERT INTO history VALUES (?)')
-    newHistory.entries.forEach((entry) =>
-      statement.run(JSON.stringify(entry)),
+export async function load(database: Database) {
+  const history = await new Promise<JobHistory>((resolve, reject) => {
+    let history: JobHistory = { entries: [] }
+    database.each(
+      'select entry from history',
+      (error, { entry: entryAsString }) => {
+        if (error) reject(error)
+        else {
+          const entry = JSON.parse(entryAsString)
+          history.entries.push(entry)
+        }
+      },
+      () => resolve(history),
     )
-    statement.finalize((error) => (error ? reject(error) : resolve()))
   })
+  const state = await new Promise<JobState>((resolve, reject) => {
+    let state: JobState = { jobs: {} }
+    database.each(
+      'select job from jobs',
+      (error, { job: jobAsString }) => {
+        if (error) reject(error)
+        else {
+          const job = JSON.parse(jobAsString)
+          state.jobs[job.jobId] = job
+        }
+      },
+      () => resolve(state),
+    )
+  })
+  return { state, history }
+}
+
+export async function save(
+  database: Database,
+  newHistory: JobHistory,
+  state: JobState,
+) {
+  const insertHistory = database.prepare('INSERT INTO history VALUES (?)')
+  const upsertJob = database.prepare('INSERT INTO jobs VALUES (?)')
+  newHistory.entries.forEach((entry) => {
+    insertHistory.run(JSON.stringify(entry))
+    upsertJob.run(JSON.stringify(state.jobs[entry.job.jobId]))
+  })
+  await new Promise<void>((resolve, reject) =>
+    insertHistory.finalize((error) => (error ? reject(error) : resolve())),
+  )
+  await new Promise<void>((resolve, reject) =>
+    upsertJob.finalize((error) => (error ? reject(error) : resolve())),
+  )
 }
