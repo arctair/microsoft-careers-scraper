@@ -9,9 +9,7 @@ async function main() {
     console.error(`getting results at offset ${offset}`)
     const response = await retry(() => get(offset))
     const data = extractPayload(response.data)
-    await axios.post(target, data, {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    await retry(() => pump(data))
 
     count = JSON.parse(data).eagerLoadRefineSearch.data.jobs.length
     offset += count
@@ -28,6 +26,12 @@ function get(offset: number) {
       }),
     },
   )
+}
+
+function pump(data: string) {
+  return axios.post(target, data, {
+    headers: { 'Content-Type': 'application/json' },
+  })
 }
 
 async function retry<T>(fn: () => Promise<T>) {
