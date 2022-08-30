@@ -7,9 +7,15 @@ async function main() {
   let count
   do {
     console.error(`getting results at offset ${offset}`)
-    const response = await retry(() => get(offset))
+    const response = await retry(
+      () => get(offset),
+      (wait) => console.error(`retrying download in ${wait}ms`),
+    )
     const data = extractPayload(response.data)
-    await retry(() => pump(data))
+    await retry(
+      () => pump(data),
+      (wait) => console.error(`retrying upload in ${wait}ms`),
+    )
 
     count = JSON.parse(data).eagerLoadRefineSearch.data.jobs.length
     offset += count
@@ -34,14 +40,17 @@ function pump(data: string) {
   })
 }
 
-async function retry<T>(fn: () => Promise<T>) {
+async function retry<T>(
+  fn: () => Promise<T>,
+  onRetry: (waitMilleseconds: number) => void,
+) {
   for (let i = 0; ; i++) {
     try {
       return await fn()
     } catch (e) {
       if (i < 8) {
         const wait = 250 * Math.pow(2, i)
-        console.error(`retrying in ${wait}ms`)
+        onRetry(wait)
         await new Promise((resolve) => setTimeout(resolve, wait))
         continue
       } else throw e
