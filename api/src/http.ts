@@ -21,10 +21,19 @@ async function main() {
     response.json({ history, state })
   })
 
-  app.get('/history', function (_, response) {
-    const count = history.entries.length
-    const start = Math.max(0, count - 20)
-    response.json({ entries: history.entries.slice(start, count) })
+  app.get('/history', function (request, response) {
+    const jobId = request.query.jobId
+    if (jobId) {
+      response.json({
+        entries: history.entries.filter(
+          (entry) => entry.job.jobId === jobId,
+        ),
+      })
+    } else {
+      const count = history.entries.length
+      const start = Math.max(0, count - 20)
+      response.json({ entries: history.entries.slice(start, count) })
+    }
   })
 
   app.post('/', async function (request, response) {
