@@ -32,7 +32,9 @@ async function main() {
     state = index(state, request.body)
     const previousHistory = history
     history = updateHistory(history, previousState, state)
-    await save(database, previousHistory, history)
+    await save(database, {
+      entries: history.entries.slice(previousHistory.entries.length),
+    })
     response.sendStatus(204)
   })
 }

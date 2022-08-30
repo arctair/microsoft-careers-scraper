@@ -31,16 +31,12 @@ export function load(database: Database) {
   )
 }
 
-export function save(
-  database: Database,
-  previousHistory: JobHistory,
-  history: JobHistory,
-) {
+export function save(database: Database, newHistory: JobHistory) {
   return new Promise<void>((resolve, reject) => {
     const statement = database.prepare('INSERT INTO history VALUES (?)')
-    history.entries
-      .slice(previousHistory.entries.length)
-      .forEach((entry) => statement.run(JSON.stringify(entry)))
+    newHistory.entries.forEach((entry) =>
+      statement.run(JSON.stringify(entry)),
+    )
     statement.finalize((error) => (error ? reject(error) : resolve()))
   })
 }

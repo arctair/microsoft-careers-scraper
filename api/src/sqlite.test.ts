@@ -20,11 +20,7 @@ describe('save and load', () => {
 
     const job = { jobId: 'the job id' }
 
-    await save(
-      database,
-      { entries: [] },
-      { entries: [{ type: 'add', job }] },
-    )
+    await save(database, { entries: [{ type: 'add', job }] })
 
     const actual = await load(database)
     const expected: { history: JobHistory; state: JobState } = {
