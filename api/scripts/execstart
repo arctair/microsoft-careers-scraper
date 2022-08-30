@@ -1,0 +1,5 @@
+#!/bin/zsh
+source /usr/share/nvm/init-nvm.sh
+nvm use
+mkdir -p /home/arctair/microsoft-careers-scraper.data
+SQLITE_PATH=/home/arctair/microsoft-careers-scraper.data/microsoft-careers-scraper.sqlite npm start

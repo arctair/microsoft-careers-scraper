@@ -1,0 +1,23 @@
+#!/bin/zsh
+cat <<EOF | ssh yagni -T
+  setopt verbose
+  set -e
+  if [ ! -d microsoft-careers-scraper ] ; then
+    git clone https://github.com/arctair/microsoft-careers-scraper
+  fi
+  cd microsoft-careers-scraper
+  if ! grep api .git/info/sparse-checkout 2&>/dev/null ; then
+    git config core.sparseCheckout true
+    echo api >> .git/info/sparse-checkout
+  fi
+  git fetch origin main
+  git reset origin/main --hard
+  cd api
+  npm i
+  if [ -L $HOME/.config/systemd/user/microsoft-careers-scraper.service ] ; then
+    systemctl stop --user microsoft-careers-scraper
+    systemctl disable --user microsoft-careers-scraper
+  fi
+  ln -s $HOME/microsoft-careers-scraper/api/scripts/microsoft-careers-scraper.service $HOME/.config/systemd/user
+  systemctl enable --user microsoft-careers-scraper
+EOF

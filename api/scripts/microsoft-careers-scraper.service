@@ -1,0 +1,10 @@
+[Unit]
+Description=microsoft-careers-scraper
+
+[Service]
+ExecStart=/home/arctair/microsoft-careers-scraper/api/scripts/execstart
+Type=simple
+WorkingDirectory=/home/arctair/microsoft-careers-scraper/api
+
+[Install]
+WantedBy=default.target
