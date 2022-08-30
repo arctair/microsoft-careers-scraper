@@ -19,12 +19,16 @@ async function main() {
 }
 
 function get(offset: number) {
-  return axios.get('https://careers.microsoft.com/us/en/search-results', {
-    params: new URLSearchParams({
-      from: offset.toString(),
-      s: '1',
-    }),
-  })
+  return axios.get(
+    'https://careers.microsoft.com/professionals/us/en/search-results',
+    {
+      params: new URLSearchParams({
+        from: offset.toString(),
+        rk: 'l-l-seattlearea',
+        s: '1',
+      }),
+    },
+  )
 }
 
 async function retry<T>(fn: () => Promise<T>) {
