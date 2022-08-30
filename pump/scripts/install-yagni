@@ -1,0 +1,17 @@
+#!/bin/zsh
+cat <<EOF | ssh yagni -T
+  setopt verbose
+  set -e
+  if [ ! -d microsoft-careers-scraper ] ; then
+    git clone https://github.com/arctair/microsoft-careers-scraper
+  fi
+  cd microsoft-careers-scraper
+  if ! grep pump .git/info/sparse-checkout 2&>/dev/null ; then
+    git config core.sparseCheckout true
+    echo pump >> .git/info/sparse-checkout
+  fi
+  git fetch origin main
+  git reset origin/main --hard
+  cd pump
+  npm i
+EOF

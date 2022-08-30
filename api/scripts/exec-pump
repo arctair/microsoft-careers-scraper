@@ -1,5 +1,0 @@
-#!/bin/zsh
-source /usr/share/nvm/init-nvm.sh
-cd /home/arctair/microsoft-careers-scraper/api
-nvm use
-npm run start-pump

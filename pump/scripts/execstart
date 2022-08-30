@@ -1,0 +1,5 @@
+#!/bin/zsh
+source /usr/share/nvm/init-nvm.sh
+cd /home/arctair/microsoft-careers-scraper/pump
+nvm use
+npm start

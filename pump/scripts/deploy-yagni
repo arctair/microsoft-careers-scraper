@@ -1,0 +1,11 @@
+#!/bin/zsh
+cat <<EOF | ssh yagni -T
+    source /usr/share/nvm/init-nvm.sh
+
+    cd /home/arctair/microsoft-careers-scraper
+    git fetch
+    git reset origin/main --hard
+    cd pump
+    nvm install
+    npm install
+EOF
