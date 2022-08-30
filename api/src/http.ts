@@ -27,7 +27,7 @@ async function main() {
     const previousHistory = history
     history = updateHistory(history, previousState, state)
     await save(database, previousHistory, history)
-    response.json({ history, state })
+    response.sendStatus(204)
   })
 }
 
