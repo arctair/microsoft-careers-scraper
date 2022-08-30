@@ -25,14 +25,15 @@ async function main() {
     const jobId = request.query.jobId
     if (jobId) {
       response.json({
-        entries: history.entries.filter(
-          (entry) => entry.job.jobId === jobId,
-        ),
+        entries: history.entries
+          .filter((entry) => entry.job.jobId === jobId)
+          .reverse(),
       })
     } else {
-      const count = history.entries.length
-      const start = Math.max(0, count - 20)
-      response.json({ entries: history.entries.slice(start, count) })
+      const start = Math.max(0, history.entries.length - 20)
+      response.json({
+        entries: history.entries.slice(start).reverse(),
+      })
     }
   })
 
