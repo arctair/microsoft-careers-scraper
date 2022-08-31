@@ -22,6 +22,32 @@ async function main() {
     response.json({ history, index })
   })
 
+  app.get('/jobs', function (request, response) {
+    const jobs = Object.values(index.jobs)
+    const start = clamp(
+      parseInt(request.query.start?.toString() || '0'),
+      jobs.length,
+    )
+    const end = Math.max(
+      start,
+      clamp(
+        request.query.end
+          ? parseInt(request.query.end.toString())
+          : start + 20,
+        jobs.length,
+      ),
+    )
+    response.json({ jobs: jobs.slice(start, end) })
+  })
+
+  function clamp(value: number, high: number) {
+    return Math.max(Math.min(value, high), -high)
+  }
+
+  function _default(valueAsString: string, _default: number) {
+    return parseInt(valueAsString)
+  }
+
   app.get('/history', function (request, response) {
     const jobId = request.query.jobId?.toString()
     const entries = jobId ? matchingJobId(history, jobId) : last20(history)
