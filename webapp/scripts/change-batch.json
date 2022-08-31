@@ -1,0 +1,16 @@
+{
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "populated by script",
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": "populated by script",
+          "DNSName": "populated by script",
+          "EvaluateTargetHealth": false
+        }
+      }
+    }
+  ]
+}
