@@ -2,7 +2,7 @@ import express from 'express'
 import { Database } from 'sqlite3'
 import diff from './diff'
 import { initialize, load, save } from './sqlite'
-import { index, bindUpdateHistory } from './state'
+import { index, bindUpdateHistory, JobHistory } from './state'
 
 const SQLITE_PATH = process.env.SQLITE_PATH
 if (SQLITE_PATH === undefined) {
@@ -23,20 +23,19 @@ async function main() {
   })
 
   app.get('/history', function (request, response) {
-    const jobId = request.query.jobId
-    if (jobId) {
-      response.json({
-        entries: history.entries
-          .filter((entry) => entry.jobId === jobId)
-          .reverse(),
-      })
-    } else {
-      const start = Math.max(0, history.entries.length - 20)
-      response.json({
-        entries: history.entries.slice(start).reverse(),
-      })
-    }
+    const jobId = request.query.jobId?.toString()
+    const entries = jobId ? matchingJobId(history, jobId) : last20(history)
+    response.json({ entries: entries.reverse() })
   })
+
+  function matchingJobId(history: JobHistory, jobId: string) {
+    return history.entries.filter((entry) => entry.jobId === jobId)
+  }
+
+  function last20(history: JobHistory) {
+    const start = Math.max(0, history.entries.length - 20)
+    return history.entries.slice(start)
+  }
 
   const updateHistory = bindUpdateHistory(diff)
   app.post('/', async function (request, response) {
