@@ -10,4 +10,5 @@ cat <<EOF | ssh yagni -T
     npm install
     systemctl daemon-reload --user
     systemctl restart microsoft-careers-scraper --user
+    journalctl -b --user --follow -u microsoft-careers-scraper
 EOF
