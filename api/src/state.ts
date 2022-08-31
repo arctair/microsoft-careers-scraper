@@ -2,12 +2,12 @@ export function reindex(
   state: JobsById,
   payload: SearchPayload,
 ): JobsById {
-  return {
-    jobs: payload.eagerLoadRefineSearch.data.jobs.reduce(
-      (jobs, cur) => Object.assign({}, jobs, { [cur.jobId]: cur }),
-      state.jobs,
-    ),
-  }
+  const jobs = payload.eagerLoadRefineSearch.data.jobs.reduce(
+    (jobs, cur) => Object.assign({}, jobs, { [cur.jobId]: cur }),
+    state.jobs,
+  )
+  const count = Object.keys(jobs).length
+  return { count, jobs }
 }
 
 export function bindUpdateHistory(diff: (j0: Job, j1: Job) => string) {
@@ -34,6 +34,7 @@ export function bindUpdateHistory(diff: (j0: Job, j1: Job) => string) {
 }
 
 export interface JobsById {
+  count: number
   jobs: Record<string, Job>
 }
 

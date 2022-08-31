@@ -15,7 +15,7 @@ describe('save and load', () => {
     const actual = await load(database)
     const expected: LoadContainer = {
       history: { entries: [] },
-      index: { jobs: {} },
+      index: { count: 0, jobs: {} },
     }
     expect(actual).toStrictEqual(expected)
   })
@@ -28,13 +28,13 @@ describe('save and load', () => {
     await save(
       database,
       { entries: [{ job, jobId: job.jobId, type: 'add' }] },
-      { jobs: { [job.jobId]: job } },
+      { count: 1, jobs: { [job.jobId]: job } },
     )
 
     const actual = await load(database)
     const expected: LoadContainer = {
       history: { entries: [{ job, jobId: job.jobId, type: 'add' }] },
-      index: { jobs: { [job.jobId]: job } },
+      index: { count: 1, jobs: { [job.jobId]: job } },
     }
     expect(actual).toStrictEqual(expected)
   })

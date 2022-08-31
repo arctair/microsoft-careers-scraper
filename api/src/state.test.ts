@@ -24,6 +24,7 @@ describe('index', () => {
       { eagerLoadRefineSearch: { data: { jobs: [dummyJob1] } } },
     )
     const expected: JobsById = {
+      count: 1,
       jobs: { [dummyJob1.jobId]: dummyJob1 },
     }
     expect(actual).toStrictEqual(expected)
@@ -32,6 +33,7 @@ describe('index', () => {
   test('preserve one job, overwrite one job, and add one job', () => {
     const actual = reindex(
       {
+        count: 2,
         jobs: {
           [dummyJob1.jobId]: dummyJob1,
           [dummyJob2.jobId]: dummyJob2,
@@ -44,6 +46,7 @@ describe('index', () => {
       },
     )
     const expected: JobsById = {
+      count: 3,
       jobs: {
         [dummyJob1.jobId]: dummyJob1,
         [updatedDummyJob2.jobId]: updatedDummyJob2,
@@ -60,8 +63,8 @@ describe('update history', () => {
   test('add new to empty', () => {
     const actual = updateHistory(
       { entries: [] },
-      { jobs: {} },
-      { jobs: { [dummyJob1.jobId]: dummyJob1 } },
+      { count: 0, jobs: {} },
+      { count: 0, jobs: { [dummyJob1.jobId]: dummyJob1 } },
     )
     const expected: JobHistory = {
       entries: [{ job: dummyJob1, jobId: dummyJob1.jobId, type: 'add' }],
@@ -74,8 +77,9 @@ describe('update history', () => {
       {
         entries: [{ job: dummyJob2, jobId: dummyJob2.jobId, type: 'add' }],
       },
-      { jobs: { [dummyJob2.jobId]: dummyJob2 } },
+      { count: 1, jobs: { [dummyJob2.jobId]: dummyJob2 } },
       {
+        count: 1,
         jobs: {
           [updatedDummyJob2.jobId]: updatedDummyJob2,
         },
@@ -99,8 +103,9 @@ describe('update history', () => {
       {
         entries: [{ job: dummyJob2, jobId: dummyJob2.jobId, type: 'add' }],
       },
-      { jobs: { [dummyJob2.jobId]: dummyJob2 } },
+      { count: 1, jobs: { [dummyJob2.jobId]: dummyJob2 } },
       {
+        count: 1,
         jobs: {
           [dummyJob2.jobId]: dummyJob2,
         },

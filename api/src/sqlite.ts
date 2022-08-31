@@ -1,22 +1,24 @@
 import { Database } from 'sqlite3'
-import { JobHistory, JobsById } from './state'
+import { Job, JobHistory, JobsById } from './state'
 
 export async function initialize(database: Database) {
-  await new Promise<void>((resolve, reject) =>
-    database.run(
-      'create table if not exists history (entry TEXT)',
-      (error) => (error ? reject(error) : resolve()),
-    ),
-  )
-  await new Promise<void>((resolve, reject) =>
-    database.run('create table if not exists jobs (job TEXT)', (error) =>
-      error ? reject(error) : resolve(),
-    ),
-  )
+  for (const q of [
+    'create table if not exists history (entry TEXT)',
+    'create table if not exists jobs (job TEXT)',
+  ]) {
+    await new Promise<void>((resolve, reject) =>
+      database.run(q, (error) => (error ? reject(error) : resolve())),
+    )
+  }
 }
 
-export async function load(database: Database) {
-  const history = await new Promise<JobHistory>((resolve, reject) => {
+export const load = async (database: Database) => ({
+  history: await loadHistory(database),
+  index: await loadIndex(database),
+})
+
+function loadHistory(database: Database) {
+  return new Promise<JobHistory>((resolve, reject) => {
     let history: JobHistory = { entries: [] }
     database.each(
       'select entry from history',
@@ -30,21 +32,27 @@ export async function load(database: Database) {
       () => resolve(history),
     )
   })
-  const index = await new Promise<JobsById>((resolve, reject) => {
-    let index: JobsById = { jobs: {} }
+}
+
+function loadIndex(database: Database) {
+  return new Promise<JobsById>((resolve, reject) => {
+    const jobs: Record<string, Job> = {}
     database.each(
       'select job from jobs',
       (error, { job: jobAsString }) => {
         if (error) reject(error)
         else {
           const job = JSON.parse(jobAsString)
-          index.jobs[job.jobId] = job
+          jobs[job.jobId] = job
         }
       },
-      () => resolve(index),
+      () =>
+        resolve({
+          count: Object.keys(jobs).length,
+          jobs,
+        }),
     )
   })
-  return { history, index }
 }
 
 export async function save(
@@ -58,10 +66,9 @@ export async function save(
     insertHistory.run(JSON.stringify(entry))
     upsertJob.run(JSON.stringify(state.jobs[entry.jobId]))
   })
-  await new Promise<void>((resolve, reject) =>
-    insertHistory.finalize((error) => (error ? reject(error) : resolve())),
-  )
-  await new Promise<void>((resolve, reject) =>
-    upsertJob.finalize((error) => (error ? reject(error) : resolve())),
-  )
+  for (const statement of [insertHistory, upsertJob]) {
+    await new Promise<void>((resolve, reject) =>
+      statement.finalize((error) => (error ? reject(error) : resolve())),
+    )
+  }
 }
