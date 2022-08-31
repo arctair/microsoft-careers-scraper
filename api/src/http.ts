@@ -2,7 +2,7 @@ import express from 'express'
 import { Database } from 'sqlite3'
 import diff from './diff'
 import { initialize, load, save } from './sqlite'
-import { index, bindUpdateHistory, JobHistory } from './state'
+import { reindex, bindUpdateHistory, JobHistory } from './state'
 
 const SQLITE_PATH = process.env.SQLITE_PATH
 if (SQLITE_PATH === undefined) {
@@ -16,10 +16,10 @@ async function main() {
   const database = new Database(SQLITE_PATH!)
   await initialize(database)
 
-  let { state, history } = await load(database)
+  let { index, history } = await load(database)
 
   app.get('/', function (_, response) {
-    response.json({ history, state })
+    response.json({ history, index })
   })
 
   app.get('/history', function (request, response) {
@@ -39,16 +39,16 @@ async function main() {
 
   const updateHistory = bindUpdateHistory(diff)
   app.post('/', async function (request, response) {
-    const previousState = state
-    state = index(state, request.body)
+    const previousIndex = index
+    index = reindex(index, request.body)
     const previousHistory = history
-    history = updateHistory(history, previousState, state)
+    history = updateHistory(history, previousIndex, index)
     await save(
       database,
       {
         entries: history.entries.slice(previousHistory.entries.length),
       },
-      state,
+      index,
     )
     response.sendStatus(204)
   })

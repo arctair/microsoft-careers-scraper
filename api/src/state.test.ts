@@ -1,4 +1,4 @@
-import { bindUpdateHistory, index, JobHistory, JobState } from './state'
+import { bindUpdateHistory, reindex, JobHistory, JobsById } from './state'
 
 const {
   dummyJob1,
@@ -19,16 +19,18 @@ interface StubJob {
 
 describe('index', () => {
   test('new job', () => {
-    const actual = index(
-      { jobs: {} },
+    const actual = reindex(
+      { count: 0, jobs: {} },
       { eagerLoadRefineSearch: { data: { jobs: [dummyJob1] } } },
     )
-    const expected: JobState = { jobs: { [dummyJob1.jobId]: dummyJob1 } }
+    const expected: JobsById = {
+      jobs: { [dummyJob1.jobId]: dummyJob1 },
+    }
     expect(actual).toStrictEqual(expected)
   })
 
   test('preserve one job, overwrite one job, and add one job', () => {
-    const actual = index(
+    const actual = reindex(
       {
         jobs: {
           [dummyJob1.jobId]: dummyJob1,
@@ -41,7 +43,7 @@ describe('index', () => {
         },
       },
     )
-    const expected: JobState = {
+    const expected: JobsById = {
       jobs: {
         [dummyJob1.jobId]: dummyJob1,
         [updatedDummyJob2.jobId]: updatedDummyJob2,

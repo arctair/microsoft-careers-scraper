@@ -1,6 +1,11 @@
 import { Database } from 'sqlite3'
 import { initialize, load, save } from './sqlite'
-import { JobHistory, JobState } from './state'
+import { JobHistory, JobsById } from './state'
+
+interface LoadContainer {
+  history: JobHistory
+  index: JobsById
+}
 
 describe('save and load', () => {
   test('first load', async () => {
@@ -8,9 +13,9 @@ describe('save and load', () => {
     await initialize(database)
 
     const actual = await load(database)
-    const expected: { history: JobHistory; state: JobState } = {
+    const expected: LoadContainer = {
       history: { entries: [] },
-      state: { jobs: {} },
+      index: { jobs: {} },
     }
     expect(actual).toStrictEqual(expected)
   })
@@ -27,9 +32,9 @@ describe('save and load', () => {
     )
 
     const actual = await load(database)
-    const expected: { history: JobHistory; state: JobState } = {
+    const expected: LoadContainer = {
       history: { entries: [{ job, jobId: job.jobId, type: 'add' }] },
-      state: { jobs: { [job.jobId]: job } },
+      index: { jobs: { [job.jobId]: job } },
     }
     expect(actual).toStrictEqual(expected)
   })

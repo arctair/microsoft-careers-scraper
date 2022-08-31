@@ -1,4 +1,7 @@
-export function index(state: JobState, payload: SearchPayload): JobState {
+export function reindex(
+  state: JobsById,
+  payload: SearchPayload,
+): JobsById {
   return {
     jobs: payload.eagerLoadRefineSearch.data.jobs.reduce(
       (jobs, cur) => Object.assign({}, jobs, { [cur.jobId]: cur }),
@@ -10,8 +13,8 @@ export function index(state: JobState, payload: SearchPayload): JobState {
 export function bindUpdateHistory(diff: (j0: Job, j1: Job) => string) {
   return function updateHistory(
     history: JobHistory,
-    previous: JobState,
-    current: JobState,
+    previous: JobsById,
+    current: JobsById,
   ): JobHistory {
     return {
       entries: Object.values(current.jobs).reduce((entries, job) => {
@@ -30,7 +33,7 @@ export function bindUpdateHistory(diff: (j0: Job, j1: Job) => string) {
   }
 }
 
-export interface JobState {
+export interface JobsById {
   jobs: Record<string, Job>
 }
 

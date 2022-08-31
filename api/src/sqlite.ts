@@ -1,5 +1,5 @@
 import { Database } from 'sqlite3'
-import { JobHistory, JobState } from './state'
+import { JobHistory, JobsById } from './state'
 
 export async function initialize(database: Database) {
   await new Promise<void>((resolve, reject) =>
@@ -30,27 +30,27 @@ export async function load(database: Database) {
       () => resolve(history),
     )
   })
-  const state = await new Promise<JobState>((resolve, reject) => {
-    let state: JobState = { jobs: {} }
+  const index = await new Promise<JobsById>((resolve, reject) => {
+    let index: JobsById = { jobs: {} }
     database.each(
       'select job from jobs',
       (error, { job: jobAsString }) => {
         if (error) reject(error)
         else {
           const job = JSON.parse(jobAsString)
-          state.jobs[job.jobId] = job
+          index.jobs[job.jobId] = job
         }
       },
-      () => resolve(state),
+      () => resolve(index),
     )
   })
-  return { state, history }
+  return { history, index }
 }
 
 export async function save(
   database: Database,
   newHistory: JobHistory,
-  state: JobState,
+  state: JobsById,
 ) {
   const insertHistory = database.prepare('INSERT INTO history VALUES (?)')
   const upsertJob = database.prepare('INSERT INTO jobs VALUES (?)')
