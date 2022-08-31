@@ -1,7 +1,8 @@
 import express from 'express'
 import { Database } from 'sqlite3'
+import diff from './diff'
 import { initialize, load, save } from './sqlite'
-import { index, updateHistory } from './state'
+import { index, bindUpdateHistory } from './state'
 
 const SQLITE_PATH = process.env.SQLITE_PATH
 if (SQLITE_PATH === undefined) {
@@ -37,6 +38,7 @@ async function main() {
     }
   })
 
+  const updateHistory = bindUpdateHistory(diff)
   app.post('/', async function (request, response) {
     const previousState = state
     state = index(state, request.body)

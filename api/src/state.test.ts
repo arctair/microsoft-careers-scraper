@@ -1,4 +1,4 @@
-import { index, JobHistory, JobState, updateHistory } from './state'
+import { bindUpdateHistory, index, JobHistory, JobState } from './state'
 
 const {
   dummyJob1,
@@ -53,6 +53,8 @@ describe('index', () => {
 })
 
 describe('update history', () => {
+  const stubDiff = jest.fn()
+  const updateHistory = bindUpdateHistory(stubDiff)
   test('add new to empty', () => {
     const actual = updateHistory(
       { entries: [] },
@@ -65,6 +67,7 @@ describe('update history', () => {
     expect(actual).toStrictEqual(expected)
   })
   test('update existing', () => {
+    stubDiff.mockReturnValue('the diff')
     const actual = updateHistory(
       {
         entries: [{ job: dummyJob2, jobId: dummyJob2.jobId, type: 'add' }],
@@ -80,6 +83,7 @@ describe('update history', () => {
       entries: [
         { job: dummyJob2, jobId: dummyJob2.jobId, type: 'add' },
         {
+          diff: 'the diff',
           job: updatedDummyJob2,
           jobId: updatedDummyJob2.jobId,
           type: 'update',
@@ -87,6 +91,7 @@ describe('update history', () => {
       ],
     }
     expect(actual).toStrictEqual(expected)
+    expect(stubDiff).toHaveBeenCalledWith(dummyJob2, updatedDummyJob2)
   })
   test('no change to existing', () => {
     const actual = updateHistory(
