@@ -16,10 +16,10 @@ export function updateHistory(
     entries: Object.values(current.jobs).reduce(
       (entries, job) =>
         !(job.jobId in previous.jobs)
-          ? entries.concat({ type: 'add', job })
+          ? entries.concat({ job, jobId: job.jobId, type: 'add' })
           : JSON.stringify(previous.jobs[job.jobId]) !==
             JSON.stringify(job)
-          ? entries.concat({ type: 'update', job })
+          ? entries.concat({ job, jobId: job.jobId, type: 'update' })
           : entries,
       history.entries,
     ),
@@ -39,8 +39,9 @@ export interface JobHistory {
 }
 
 interface HistoryEntry {
-  type: 'add' | 'update'
   job: Job
+  jobId: string
+  type: 'add' | 'update'
 }
 
 export interface SearchPayload {

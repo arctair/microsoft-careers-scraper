@@ -22,13 +22,13 @@ describe('save and load', () => {
 
     await save(
       database,
-      { entries: [{ type: 'add', job }] },
+      { entries: [{ job, jobId: job.jobId, type: 'add' }] },
       { jobs: { [job.jobId]: job } },
     )
 
     const actual = await load(database)
     const expected: { history: JobHistory; state: JobState } = {
-      history: { entries: [{ type: 'add', job }] },
+      history: { entries: [{ job, jobId: job.jobId, type: 'add' }] },
       state: { jobs: { [job.jobId]: job } },
     }
     expect(actual).toStrictEqual(expected)

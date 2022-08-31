@@ -60,13 +60,15 @@ describe('update history', () => {
       { jobs: { [dummyJob1.jobId]: dummyJob1 } },
     )
     const expected: JobHistory = {
-      entries: [{ type: 'add', job: dummyJob1 }],
+      entries: [{ job: dummyJob1, jobId: dummyJob1.jobId, type: 'add' }],
     }
     expect(actual).toStrictEqual(expected)
   })
   test('update existing', () => {
     const actual = updateHistory(
-      { entries: [{ type: 'add', job: dummyJob2 }] },
+      {
+        entries: [{ job: dummyJob2, jobId: dummyJob2.jobId, type: 'add' }],
+      },
       { jobs: { [dummyJob2.jobId]: dummyJob2 } },
       {
         jobs: {
@@ -76,15 +78,21 @@ describe('update history', () => {
     )
     const expected: JobHistory = {
       entries: [
-        { type: 'add', job: dummyJob2 },
-        { type: 'update', job: updatedDummyJob2 },
+        { job: dummyJob2, jobId: dummyJob2.jobId, type: 'add' },
+        {
+          job: updatedDummyJob2,
+          jobId: updatedDummyJob2.jobId,
+          type: 'update',
+        },
       ],
     }
     expect(actual).toStrictEqual(expected)
   })
   test('no change to existing', () => {
     const actual = updateHistory(
-      { entries: [{ type: 'add', job: dummyJob2 }] },
+      {
+        entries: [{ job: dummyJob2, jobId: dummyJob2.jobId, type: 'add' }],
+      },
       { jobs: { [dummyJob2.jobId]: dummyJob2 } },
       {
         jobs: {
@@ -93,7 +101,7 @@ describe('update history', () => {
       },
     )
     const expected: JobHistory = {
-      entries: [{ type: 'add', job: dummyJob2 }],
+      entries: [{ job: dummyJob2, jobId: dummyJob2.jobId, type: 'add' }],
     }
     expect(actual).toStrictEqual(expected)
   })
