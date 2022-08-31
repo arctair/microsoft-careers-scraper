@@ -21,7 +21,6 @@ export function bindUpdateHistory(diff: (j0: Job, j1: Job) => string) {
             JSON.stringify(job)
           ? entries.concat({
               diff: diff(previous.jobs[job.jobId], job),
-              job,
               jobId: job.jobId,
               type: 'update',
             })
@@ -51,7 +50,6 @@ type HistoryEntry =
     }
   | {
       diff: string
-      job: Job
       jobId: string
       type: 'update'
     }

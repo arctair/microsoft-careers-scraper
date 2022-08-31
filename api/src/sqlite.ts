@@ -56,7 +56,7 @@ export async function save(
   const upsertJob = database.prepare('INSERT INTO jobs VALUES (?)')
   newHistory.entries.forEach((entry) => {
     insertHistory.run(JSON.stringify(entry))
-    upsertJob.run(JSON.stringify(state.jobs[entry.job.jobId]))
+    upsertJob.run(JSON.stringify(state.jobs[entry.jobId]))
   })
   await new Promise<void>((resolve, reject) =>
     insertHistory.finalize((error) => (error ? reject(error) : resolve())),

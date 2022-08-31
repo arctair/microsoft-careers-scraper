@@ -27,7 +27,7 @@ async function main() {
     if (jobId) {
       response.json({
         entries: history.entries
-          .filter((entry) => entry.job.jobId === jobId)
+          .filter((entry) => entry.jobId === jobId)
           .reverse(),
       })
     } else {

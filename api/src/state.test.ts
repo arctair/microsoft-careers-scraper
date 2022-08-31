@@ -84,7 +84,6 @@ describe('update history', () => {
         { job: dummyJob2, jobId: dummyJob2.jobId, type: 'add' },
         {
           diff: 'the diff',
-          job: updatedDummyJob2,
           jobId: updatedDummyJob2.jobId,
           type: 'update',
         },
