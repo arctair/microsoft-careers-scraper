@@ -6,15 +6,15 @@ async function main() {
   let offset = 0
   let count
   do {
-    console.error(`getting results at offset ${offset}`)
+    console.log(`getting results at offset ${offset}`)
     const response = await retry(
       () => get(offset),
-      (wait) => console.error(`retrying download in ${wait}ms`),
+      (wait) => console.log(`retrying download in ${wait}ms`),
     )
     const data = extractPayload(response.data)
     await retry(
       () => pump(data),
-      (wait) => console.error(`retrying upload in ${wait}ms`),
+      (wait) => console.log(`retrying upload in ${wait}ms`),
     )
 
     count = JSON.parse(data).eagerLoadRefineSearch.data.jobs.length
