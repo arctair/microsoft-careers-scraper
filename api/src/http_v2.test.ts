@@ -3,7 +3,7 @@ import http from './http_v2'
 import { SearchPayload } from './state'
 import { StateV2 } from './types'
 
-beforeAll(() => setTestApp(http))
+beforeAll(() => setTestApp(http()))
 
 describe('http v2', () => {
   test('get / returns default state', async () => {
@@ -14,7 +14,7 @@ describe('http v2', () => {
       touches: [],
     })
   })
-  test('post / with search payload does nothing', async () => {
+  test('post / with search payload', async () => {
     const searchPayload: SearchPayload = {
       eagerLoadRefineSearch: { data: { jobs: [] } },
     }
