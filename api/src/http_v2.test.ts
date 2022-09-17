@@ -18,7 +18,9 @@ describe('http v2', () => {
     const searchPayload: SearchPayload = {
       eagerLoadRefineSearch: { data: { jobs: [] } },
     }
-    const response = await request.post('/', searchPayload)
+    const response = await request.post('/', searchPayload, {
+      headers: { 'Content-Type': 'application/json' },
+    })
     expect(response.status).toBe(200)
   })
 })
