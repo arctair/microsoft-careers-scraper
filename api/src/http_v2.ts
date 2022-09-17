@@ -1,20 +1,27 @@
 import express = require('express')
-import { StateV2 } from './types'
+import { Engine } from './engine'
+import { SearchPayload } from './state'
 
-const http = () => {
+const http = (engine: Engine) => {
   const http = express()
   http.use(express.json())
 
-  http.get('/', (request, response) => {
-    const state: StateV2 = {
-      buckets: {},
-      touches: [],
+  http.get('/', async (request, response) => {
+    try {
+      response.json(await engine.get())
+    } catch (e: any) {
+      response.status(500).json({ message: e.message })
     }
-    response.json(state)
   })
 
-  http.post('/', (request, response) => {
-    response.sendStatus(200)
+  http.post('/', async (request, response) => {
+    try {
+      const searchPayload: SearchPayload = request.body
+      await engine.post(searchPayload.eagerLoadRefineSearch.data.jobs)
+      response.sendStatus(200)
+    } catch (e: any) {
+      response.status(500).json({ message: e.message })
+    }
   })
 
   return http
