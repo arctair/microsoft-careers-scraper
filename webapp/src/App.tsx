@@ -16,11 +16,18 @@ function JobList() {
       style={{
         display: 'flex',
         flexDirection: 'column-reverse',
-        padding: '0 1rem',
+        margin: '0.25rem',
       }}
     >
       {touches.map((jobId, index) => (
-        <div key={index} style={{ margin: '1rem 0' }}>
+        <div
+          key={index}
+          style={{
+            padding: '0.5rem',
+            margin: '0.25rem',
+            border: '1px solid gray',
+          }}
+        >
           <Job jobId={jobId} />
         </div>
       ))}
