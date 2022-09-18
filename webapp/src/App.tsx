@@ -12,9 +12,17 @@ export default function App() {
 function JobList() {
   const { touches } = useContext(context)
   return (
-    <div style={{ display: 'flex', flexDirection: 'column-reverse' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column-reverse',
+        padding: '0 1rem',
+      }}
+    >
       {touches.map((jobId, index) => (
-        <Job key={index} jobId={jobId} />
+        <div key={index} style={{ margin: '1rem 0' }}>
+          <Job jobId={jobId} />
+        </div>
       ))}
     </div>
   )
@@ -25,9 +33,10 @@ function Job({ jobId }: JobProps) {
   const { buckets } = useContext(context)
   const { latest } = buckets[jobId]
   return (
-    <div>
-      {latest.title}
+    <>
+      <h3>{latest.title}</h3>
+      {latest.descriptionTeaser}
       <span style={{ display: 'none' }}>{JSON.stringify(latest)}</span>
-    </div>
+    </>
   )
 }
