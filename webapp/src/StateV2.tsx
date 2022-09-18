@@ -1,8 +1,51 @@
 import React, { createContext, useEffect, useState } from 'react'
 
 type StateV2 = {
-  buckets: Record<string, { latest: any }>
+  buckets: Record<string, { latest: Job }>
   touches: string[]
+}
+
+type Job = {
+  applyUrl: string
+  badge: string
+  category: string
+  city: string
+  companyName: string
+  country: string
+  dateCreated: string
+  description: string
+  descriptionTeaser: string
+  employmentType: string
+  experience: string
+  industry: string
+  isMultiLocation: string
+  isRemote: string
+  jd_display: string
+  jobId: string
+  jobQualifications: string
+  jobResponsibilities: string
+  jobSeqNo: string
+  jobSummary: string
+  jobVisibility: string[]
+  locale: string
+  location: string
+  locationLatlong: string
+  mostpopular: number
+  multi_location: string[]
+  multi_location_array: { location: string }[]
+  orgFunction: string
+  parentRefNum: string
+  postedDate: string
+  refNum: string
+  reqId: string
+  requisitionRoleType: string
+  searchresults_display: string
+  state: string
+  subCategory: string
+  targetLevel: string
+  title: string
+  type: string
+  worksite: string
 }
 
 const defaultState: StateV2 = {
