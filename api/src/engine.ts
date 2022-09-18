@@ -14,3 +14,22 @@ export const dummy: Engine = {
     }),
   post: () => Promise.resolve(),
 }
+
+export const newEngine = (): Engine => {
+  const state: StateV2 = {
+    buckets: {},
+    touches: [],
+  }
+  return {
+    get: () => Promise.resolve(state),
+    post: async (jobs) => {
+      for (const job of jobs) {
+        const previous = state.buckets[job.jobId]?.latest
+        if (JSON.stringify(previous) !== JSON.stringify(job)) {
+          state.buckets[job.jobId] = { latest: job }
+          state.touches.push(job.jobId)
+        }
+      }
+    },
+  }
+}
