@@ -21,7 +21,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "sync": "aws s3 sync build/ s3://microsoft-careers-scraper.cruftbusters.com"
+    "sync": "aws s3 sync build/ s3://microsoft-careers-scraper.cruftbusters.com",
+    "invalidate": "aws cloudfront create-invalidation --distribution-id E37PS4ID0Y0M8E --paths /",
+    "build sync invalidate": "for a in build sync invalidate ; do npm run $a ; done"
   },
   "eslintConfig": {
     "extends": [
