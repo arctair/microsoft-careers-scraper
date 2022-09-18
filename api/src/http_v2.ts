@@ -4,7 +4,7 @@ import { SearchPayload } from './state'
 
 const http = (engine: Engine) => {
   const http = express()
-  http.use(express.json())
+  http.use(express.json({ limit: '4mb' }))
 
   http.get('/', async (request, response) => {
     try {
