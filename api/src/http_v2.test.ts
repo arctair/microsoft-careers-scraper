@@ -14,7 +14,7 @@ describe('http v2', () => {
   test('get / returns engine state', async () => {
     const state = {
       buckets: {},
-      touches: [{ jobId: '1', key: '42' }],
+      touches: ['1'],
     }
     engine.get.mockResolvedValueOnce(state)
     const response = await request.get('/')
