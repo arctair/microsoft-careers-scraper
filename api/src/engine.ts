@@ -1,3 +1,4 @@
+import { Database } from 'sqlite3'
 import { Job } from './state'
 import { StateV2 } from './types'
 
@@ -16,11 +17,43 @@ export const dummy: Engine = {
   post: () => Promise.resolve(),
 }
 
-export const newEngine = (): Engine => {
+export const migrate = async (database: Database) => {
+  for (const migration of [
+    'create table if not exists buckets (key text primary key, value text)',
+    'create table if not exists touches (value text)',
+  ]) {
+    await new Promise<void>((resolve, reject) =>
+      database.exec(migration, (error) =>
+        error ? reject(error) : resolve(),
+      ),
+    )
+  }
+}
+
+export const newEngine = async (database: Database): Promise<Engine> => {
   const state: StateV2 = {
-    buckets: {},
+    buckets: await new Promise((resolve, reject) => {
+      const buckets = {} as Record<string, { latest: Job }>
+      database.each(
+        'select key, value from buckets',
+        (error, row) =>
+          error
+            ? reject(error)
+            : (buckets[row.key] = JSON.parse(row.value)),
+        (error) => (error ? reject(error) : resolve(buckets)),
+      )
+      return buckets
+    }),
     offset: 0,
-    touches: [],
+    touches: await new Promise((resolve, reject) => {
+      const touches = [] as string[]
+      database.each(
+        'select value from touches',
+        (error, row) => (error ? reject(error) : touches.push(row.value)),
+        (error) => (error ? reject(error) : resolve(touches)),
+      )
+      return touches
+    }),
   }
   return {
     get: () => Promise.resolve(state),
@@ -30,6 +63,25 @@ export const newEngine = (): Engine => {
         if (JSON.stringify(previous) !== JSON.stringify(job)) {
           state.buckets[job.jobId] = { latest: job }
           state.touches.push(job.jobId)
+          const bucket_statement = database.prepare(
+            'insert into buckets (key, value) values (?, ?) on conflict do update set value = ?',
+          )
+          const value = JSON.stringify({ latest: job })
+          bucket_statement.run(job.jobId, value, value)
+          await new Promise<void>((resolve, reject) =>
+            bucket_statement.finalize((error) =>
+              error ? reject(error) : resolve(),
+            ),
+          )
+          const touch_statement = database.prepare(
+            'insert into touches (value) values (?)',
+          )
+          touch_statement.run(job.jobId)
+          await new Promise<void>((resolve, reject) =>
+            touch_statement.finalize((error) =>
+              error ? reject(error) : resolve(),
+            ),
+          )
         }
       }
     },

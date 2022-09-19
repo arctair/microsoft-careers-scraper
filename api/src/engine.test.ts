@@ -1,10 +1,13 @@
-import { newEngine } from './engine'
+import { Database } from 'sqlite3'
+import { migrate, newEngine } from './engine'
 import { StateV2 } from './types'
 
 describe('engine', () => {
+  const database = new Database(':memory:')
+  beforeAll(() => migrate(database))
+
   test('get default state', async () => {
-    const engine = newEngine()
-    const actual = await engine.get()
+    const actual = await (await newEngine(database)).get()
     const expected: StateV2 = {
       buckets: {},
       offset: 0,
@@ -13,10 +16,9 @@ describe('engine', () => {
     expect(actual).toStrictEqual(expected)
   })
   test('add job', async () => {
-    const engine = newEngine()
     const job = { jobId: 'new job' }
-    await engine.post([job])
-    const actual = await engine.get()
+    await (await newEngine(database)).post([job])
+    const actual = await (await newEngine(database)).get()
     const expected: StateV2 = {
       buckets: {
         'new job': {
@@ -29,11 +31,10 @@ describe('engine', () => {
     expect(actual).toStrictEqual(expected)
   })
   test('add duplicate job results in no touch', async () => {
-    const engine = newEngine()
     const job = { jobId: 'new job' }
-    await engine.post([job])
-    await engine.post([job])
-    const actual = await engine.get()
+    await (await newEngine(database)).post([job])
+    await (await newEngine(database)).post([job])
+    const actual = await (await newEngine(database)).get()
     const expected: StateV2 = {
       buckets: {
         'new job': {
