@@ -1,14 +1,15 @@
 import express = require('express')
 import { Engine } from './engine'
 import { SearchPayload } from './state'
+import { Touchmaster } from './touchmaster'
 
-const http = (engine: Engine) => {
+const http = (engine: Engine, touchmaster: Touchmaster) => {
   const http = express()
   http.use(express.json({ limit: '4mb' }))
 
   http.get('/', async (request, response) => {
     try {
-      response.json(await engine.get())
+      response.json(await touchmaster({ count: 100 }))
     } catch (e: any) {
       response.status(500).json({ message: e.message })
     }

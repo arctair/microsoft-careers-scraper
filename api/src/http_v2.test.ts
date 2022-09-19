@@ -7,22 +7,24 @@ const engine = {
   get: jest.fn(),
   post: jest.fn(),
 }
+const touchmaster = jest.fn()
 
-beforeAll(() => setTestApp(http(engine)))
+beforeAll(() => setTestApp(http(engine, touchmaster)))
 
 describe('http v2', () => {
-  test('get / returns engine state', async () => {
+  test('get / returns state', async () => {
     const state = {
       buckets: {},
       touches: ['1'],
     }
-    engine.get.mockResolvedValueOnce(state)
+    touchmaster.mockResolvedValueOnce(state)
     const response = await request.get('/')
     expect(response.status).toBe(200)
     expect(response.data).toStrictEqual<StateV2>(state)
+    expect(touchmaster).toHaveBeenCalledWith({ count: 100 })
   })
   test('get / returns error', async () => {
-    engine.get.mockRejectedValueOnce(new Error('another message'))
+    touchmaster.mockRejectedValueOnce(new Error('another message'))
     const response = await request.get('/')
     expect(response.status).toBe(500)
     expect(response.data).toStrictEqual({ message: 'another message' })
