@@ -53,4 +53,20 @@ describe('touchmaster', () => {
     }
     expect(actual).toStrictEqual(expected)
   })
+  test('ask for more than present', async () => {
+    const state: StateV2 = {
+      buckets: {},
+      offset: 0,
+      touches: [],
+    }
+
+    engineGet.mockResolvedValueOnce(state)
+    const actual = await touchmaster({ count: 1 })
+    const expected: StateV2 = {
+      buckets: {},
+      offset: 0,
+      touches: [],
+    }
+    expect(actual).toStrictEqual(expected)
+  })
 })
