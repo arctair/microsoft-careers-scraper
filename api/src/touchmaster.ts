@@ -15,6 +15,7 @@ export function newTouchmaster(
           Object.assign(record, { [jobId]: state.buckets[jobId] }),
         {} as Record<string, { latest: Job }>,
       ),
+      offset: state.touches.length - count,
       touches,
     }
   }

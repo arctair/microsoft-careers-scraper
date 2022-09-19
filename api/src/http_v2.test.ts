@@ -15,6 +15,7 @@ describe('http v2', () => {
   test('get / returns state', async () => {
     const state = {
       buckets: {},
+      offset: 0,
       touches: ['1'],
     }
     touchmaster.mockResolvedValueOnce(state)

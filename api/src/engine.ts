@@ -10,6 +10,7 @@ export const dummy: Engine = {
   get: () =>
     Promise.resolve({
       buckets: {},
+      offset: 0,
       touches: [],
     }),
   post: () => Promise.resolve(),
@@ -18,6 +19,7 @@ export const dummy: Engine = {
 export const newEngine = (): Engine => {
   const state: StateV2 = {
     buckets: {},
+    offset: 0,
     touches: [],
   }
   return {

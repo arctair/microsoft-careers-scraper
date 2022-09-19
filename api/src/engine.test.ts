@@ -7,6 +7,7 @@ describe('engine', () => {
     const actual = await engine.get()
     const expected: StateV2 = {
       buckets: {},
+      offset: 0,
       touches: [],
     }
     expect(actual).toStrictEqual(expected)
@@ -22,6 +23,7 @@ describe('engine', () => {
           latest: job,
         },
       },
+      offset: 0,
       touches: ['new job'],
     }
     expect(actual).toStrictEqual(expected)
@@ -38,6 +40,7 @@ describe('engine', () => {
           latest: job,
         },
       },
+      offset: 0,
       touches: ['new job'],
     }
     expect(actual).toStrictEqual(expected)

@@ -12,6 +12,7 @@ describe('touchmaster', () => {
           latest: { jobId: 'wasd' },
         },
       },
+      offset: 0,
       touches: ['wasd'],
     }
 
@@ -32,6 +33,7 @@ describe('touchmaster', () => {
           latest: { jobId: '2' },
         },
       },
+      offset: 0,
       touches: ['0', '1', '2'],
     }
 
@@ -46,6 +48,7 @@ describe('touchmaster', () => {
           latest: { jobId: '2' },
         },
       },
+      offset: 1,
       touches: ['1', '2'],
     }
     expect(actual).toStrictEqual(expected)
