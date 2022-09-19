@@ -10,34 +10,57 @@ export default function App() {
 }
 
 function JobList() {
-  const { touches } = useContext(context)
+  const {
+    filter,
+    setFilter,
+    state: { touches },
+  } = useContext(context)
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column-reverse',
-        margin: '0.25rem',
-      }}
-    >
-      {touches.map((jobId, index) => (
-        <div
-          key={index}
-          style={{
-            padding: '0.5rem',
-            margin: '0.25rem',
-            border: '1px solid gray',
-          }}
-        >
-          <Job jobId={jobId} />
-        </div>
-      ))}
-    </div>
+    <>
+      <div
+        style={{
+          backgroundColor: '#DDD',
+          padding: '0.5rem',
+        }}
+      >
+        <h1 style={{ marginBottom: '0.5rem' }}>
+          microsoft careers scraper
+        </h1>
+        search by location:{' '}
+        <input
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column-reverse',
+          margin: '0.25rem',
+        }}
+      >
+        {touches.map((jobId, index) => (
+          <div
+            key={index}
+            style={{
+              padding: '0.5rem',
+              margin: '0.25rem',
+              border: '1px solid gray',
+            }}
+          >
+            <Job jobId={jobId} />
+          </div>
+        ))}
+      </div>
+    </>
   )
 }
 
 type JobProps = { jobId: string }
 function Job({ jobId }: JobProps) {
-  const { buckets } = useContext(context)
+  const {
+    state: { buckets },
+  } = useContext(context)
   const { latest } = buckets[jobId]
   return (
     <>

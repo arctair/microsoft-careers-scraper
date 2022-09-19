@@ -52,10 +52,19 @@ const defaultState: StateV2 = {
   buckets: {},
   touches: [],
 }
-export const context = createContext(defaultState)
+export const context = createContext<{
+  filter: string | undefined
+  setFilter: (filter: string) => void
+  state: StateV2
+}>({
+  filter: undefined,
+  setFilter: () => {},
+  state: defaultState,
+})
 
 export function Provider({ children }: React.PropsWithChildren) {
   const [state, setState] = useState<StateV2>(defaultState)
+  const [filter, setFilter] = useState<string>()
   const [error, setError] = useState<string>()
   useEffect(() => {
     fetch('https://microsoft-careers-scraper-api.cruftbusters.com').then(
@@ -66,6 +75,23 @@ export function Provider({ children }: React.PropsWithChildren) {
   return error ? (
     <div>state v2 provider error: ${error}</div>
   ) : (
-    <context.Provider children={children} value={state} />
+    <context.Provider
+      children={children}
+      value={{
+        filter,
+        setFilter,
+        state: {
+          buckets: state.buckets,
+          touches: filter
+            ? state.touches.filter(
+                (jobId) =>
+                  state.buckets[jobId].latest.location
+                    .toLowerCase()
+                    .indexOf(filter) > -1,
+              )
+            : state.touches,
+        },
+      }}
+    />
   )
 }
