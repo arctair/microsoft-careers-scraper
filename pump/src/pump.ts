@@ -2,7 +2,9 @@ import axios from 'axios'
 
 const target = process.env.TARGET || 'http://localhost:8080'
 
-async function main(offset = 0) {
+async function main(
+  offset = process.env.OFFSET ? parseInt(process.env.OFFSET) : 0,
+) {
   let count
   do {
     let start: number, then: number, now: number
