@@ -1,7 +1,6 @@
 import { request, setTestApp } from 'axios-test-instance'
-import http from './http_v2'
-import { SearchPayload } from './state'
-import { StateV2 } from './types'
+import http from './http'
+import { SearchPayload, StateV2 } from './types'
 
 const engine = {
   get: jest.fn(),

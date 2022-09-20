@@ -1,6 +1,5 @@
 import { Database } from 'sqlite3'
-import { Job } from './state'
-import { StateV2 } from './types'
+import { Job, StateV2 } from './types'
 
 export type Engine = {
   get: () => Promise<StateV2>

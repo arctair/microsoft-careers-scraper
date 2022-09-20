@@ -1,85 +1,31 @@
-import express from 'express'
-import { Database } from 'sqlite3'
-import diff from './diff'
-import { initialize, load, save } from './sqlite'
-import { reindex, bindUpdateHistory, JobHistory } from './state'
+import express = require('express')
+import { Engine } from './engine'
+import { Touchmaster } from './touchmaster'
+import { SearchPayload } from './types'
 
-const SQLITE_PATH = process.env.SQLITE_PATH
-if (SQLITE_PATH === undefined) {
-  throw Error('please supply environment variable SQLITE_PATH')
+const http = (engine: Engine, touchmaster: Touchmaster) => {
+  const http = express()
+  http.use(express.json({ limit: '4mb' }))
+
+  http.get('/', async (request, response) => {
+    try {
+      response.json(await touchmaster({ count: 100 }))
+    } catch (e: any) {
+      response.status(500).json({ message: e.message })
+    }
+  })
+
+  http.post('/', async (request, response) => {
+    try {
+      const searchPayload: SearchPayload = request.body
+      await engine.post(searchPayload.eagerLoadRefineSearch.data.jobs)
+      response.sendStatus(200)
+    } catch (e: any) {
+      response.status(500).json({ message: e.message })
+    }
+  })
+
+  return http
 }
 
-const app = express()
-app.use(express.json({ limit: '4mb' }))
-
-async function main() {
-  const database = new Database(SQLITE_PATH!)
-  await initialize(database)
-
-  let { index, history } = await load(database)
-
-  app.get('/', function (_, response) {
-    response.json({ history, index })
-  })
-
-  app.get('/jobs', function (request, response) {
-    const jobs = Object.values(index.jobs)
-    const start = clamp(
-      parseInt(request.query.start?.toString() || '0'),
-      jobs.length,
-    )
-    const end = Math.max(
-      start,
-      clamp(
-        request.query.end
-          ? parseInt(request.query.end.toString())
-          : start + 20,
-        jobs.length,
-      ),
-    )
-    response.json({ jobs: jobs.slice(start, end) })
-  })
-
-  function clamp(value: number, high: number) {
-    return Math.max(Math.min(value, high), -high)
-  }
-
-  function _default(valueAsString: string, _default: number) {
-    return parseInt(valueAsString)
-  }
-
-  app.get('/history', function (request, response) {
-    const jobId = request.query.jobId?.toString()
-    const entries = jobId ? matchingJobId(history, jobId) : last20(history)
-    response.json({ entries: entries.reverse() })
-  })
-
-  function matchingJobId(history: JobHistory, jobId: string) {
-    return history.entries.filter((entry) => entry.jobId === jobId)
-  }
-
-  function last20(history: JobHistory) {
-    const start = Math.max(0, history.entries.length - 20)
-    return history.entries.slice(start)
-  }
-
-  const updateHistory = bindUpdateHistory(diff)
-  app.post('/', async function (request, response) {
-    const previousIndex = index
-    index = reindex(index, request.body)
-    const previousHistory = history
-    history = updateHistory(history, previousIndex, index)
-    await save(
-      database,
-      {
-        entries: history.entries.slice(previousHistory.entries.length),
-      },
-      index,
-    )
-    response.sendStatus(204)
-  })
-}
-
-main()
-const port = process.env.PORT || 8080
-app.listen(port, () => console.log(`0.0.0.0:${port}`))
+export default http

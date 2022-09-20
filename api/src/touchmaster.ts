@@ -1,5 +1,4 @@
-import { Job } from './state'
-import { StateV2 } from './types'
+import { Job, StateV2 } from './types'
 
 type TouchmasterProps = { count: number }
 export type Touchmaster = (props: TouchmasterProps) => Promise<StateV2>
