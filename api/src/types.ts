@@ -11,7 +11,9 @@ export interface SearchPayload {
 }
 
 export type StateV2 = {
-  buckets: Record<string, { latest: Job }>
+  buckets: BucketsValue
   offset: number
   touches: string[]
 }
+
+export type BucketsValue = Record<string, { latest: Job }>

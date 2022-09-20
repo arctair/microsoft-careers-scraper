@@ -1,19 +1,9 @@
 import { Database } from 'sqlite3'
-import { Job, StateV2 } from './types'
+import { BucketsValue, Job, StateV2 } from './types'
 
 export type Engine = {
   get: () => Promise<StateV2>
   post: (jobs: Job[]) => Promise<void>
-}
-
-export const dummy: Engine = {
-  get: () =>
-    Promise.resolve({
-      buckets: {},
-      offset: 0,
-      touches: [],
-    }),
-  post: () => Promise.resolve(),
 }
 
 export const migrate = async (database: Database) => {
@@ -31,28 +21,9 @@ export const migrate = async (database: Database) => {
 
 export const newEngine = async (database: Database): Promise<Engine> => {
   const state: StateV2 = {
-    buckets: await new Promise((resolve, reject) => {
-      const buckets = {} as Record<string, { latest: Job }>
-      database.each(
-        'select key, value from buckets',
-        (error, row) =>
-          error
-            ? reject(error)
-            : (buckets[row.key] = JSON.parse(row.value)),
-        (error) => (error ? reject(error) : resolve(buckets)),
-      )
-      return buckets
-    }),
+    buckets: await loadBuckets(database),
     offset: 0,
-    touches: await new Promise((resolve, reject) => {
-      const touches = [] as string[]
-      database.each(
-        'select value from touches',
-        (error, row) => (error ? reject(error) : touches.push(row.value)),
-        (error) => (error ? reject(error) : resolve(touches)),
-      )
-      return touches
-    }),
+    touches: await loadTouches(database),
   }
   return {
     get: () => Promise.resolve(state),
@@ -93,3 +64,26 @@ export const newEngine = async (database: Database): Promise<Engine> => {
     },
   }
 }
+
+const loadBuckets = (database: Database) =>
+  new Promise<BucketsValue>((resolve, reject) => {
+    const buckets = {} as BucketsValue
+    database.each(
+      'select key, value from buckets',
+      (error, row) =>
+        error ? reject(error) : (buckets[row.key] = JSON.parse(row.value)),
+      (error) => (error ? reject(error) : resolve(buckets)),
+    )
+    return buckets
+  })
+
+const loadTouches = (database: Database) =>
+  new Promise<string[]>((resolve, reject) => {
+    const touches = [] as string[]
+    database.each(
+      'select value from touches',
+      (error, row) => (error ? reject(error) : touches.push(row.value)),
+      (error) => (error ? reject(error) : resolve(touches)),
+    )
+    return touches
+  })
