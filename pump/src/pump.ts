@@ -2,19 +2,43 @@ import axios from 'axios'
 
 const target = process.env.TARGET || 'http://localhost:8080'
 
-async function main() {
-  let offset = 0
+async function main(offset = 0) {
   let count
   do {
-    console.log(`getting results at offset ${offset}`)
+    let start: number, then: number, now: number
+    start = then = now = new Date().getTime()
+    process.stdout.write(`offset ${offset} download duration: `)
     const response = await retry(
       () => get(offset),
-      (wait) => console.log(`retrying download in ${wait}ms`),
+      (wait) => {
+        then = now
+        now = new Date().getTime()
+        process.stdout.write(`${now - then}\n`)
+        process.stdout.write(`offset ${offset} download retry duration: `)
+      },
     )
+
+    then = now
+    now = new Date().getTime()
+    process.stdout.write(`${now - then}\n`)
+    process.stdout.write(`offset ${offset} upload duration: `)
+
     const data = extractPayload(response.data)
     await retry(
       () => pump(data),
-      (wait) => console.log(`retrying upload in ${wait}ms`),
+      (wait) => {
+        then = now
+        now = new Date().getTime()
+        process.stdout.write(`${now - then}\n`)
+        process.stdout.write(`offset ${offset} upload retry duration: `)
+      },
+    )
+
+    then = now
+    now = new Date().getTime()
+    process.stdout.write(`${now - then}\n`)
+    process.stdout.write(
+      `offset ${offset} total duration: ${now - start}\n`,
     )
 
     count = JSON.parse(data).eagerLoadRefineSearch.data.jobs.length
