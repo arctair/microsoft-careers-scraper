@@ -63,7 +63,7 @@ export const newEngine = async (database: Database): Promise<Engine> => {
       const touch_statement = database.prepare(
         'insert into touches (value) values (?)',
       )
-      for (const job of jobs) {
+      const promises = jobs.map((job) => {
         const previous = state.buckets[job.jobId]?.latest
         if (JSON.stringify(previous) !== JSON.stringify(job)) {
           state.buckets[job.jobId] = { latest: job }
@@ -76,7 +76,8 @@ export const newEngine = async (database: Database): Promise<Engine> => {
           )
           touch_statement.run(job.jobId)
         }
-      }
+      })
+      await Promise.all(promises)
       await Promise.all([
         new Promise<void>((resolve, reject) =>
           touch_statement.finalize((error) =>
