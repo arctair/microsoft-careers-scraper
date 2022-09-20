@@ -58,32 +58,38 @@ export const newEngine = async (database: Database): Promise<Engine> => {
   return {
     get: () => Promise.resolve(state),
     post: async (jobs) => {
+      const bucket_statement = database.prepare(
+        'insert into buckets (key, value) values (?, ?) on conflict do update set value = ?',
+      )
+      const touch_statement = database.prepare(
+        'insert into touches (value) values (?)',
+      )
       for (const job of jobs) {
         const previous = state.buckets[job.jobId]?.latest
         if (JSON.stringify(previous) !== JSON.stringify(job)) {
           state.buckets[job.jobId] = { latest: job }
           state.touches.push(job.jobId)
-          const bucket_statement = database.prepare(
-            'insert into buckets (key, value) values (?, ?) on conflict do update set value = ?',
-          )
-          const value = JSON.stringify({ latest: job })
-          bucket_statement.run(job.jobId, value, value)
-          await new Promise<void>((resolve, reject) =>
-            bucket_statement.finalize((error) =>
-              error ? reject(error) : resolve(),
-            ),
-          )
-          const touch_statement = database.prepare(
-            'insert into touches (value) values (?)',
+          const bucketValueAsString = JSON.stringify({ latest: job })
+          bucket_statement.run(
+            job.jobId,
+            bucketValueAsString,
+            bucketValueAsString,
           )
           touch_statement.run(job.jobId)
-          await new Promise<void>((resolve, reject) =>
-            touch_statement.finalize((error) =>
-              error ? reject(error) : resolve(),
-            ),
-          )
         }
       }
+      await Promise.all([
+        new Promise<void>((resolve, reject) =>
+          touch_statement.finalize((error) =>
+            error ? reject(error) : resolve(),
+          ),
+        ),
+        await new Promise<void>((resolve, reject) =>
+          bucket_statement.finalize((error) =>
+            error ? reject(error) : resolve(),
+          ),
+        ),
+      ])
     },
   }
 }
