@@ -20,7 +20,7 @@ function JobList() {
       <div
         style={{
           backgroundColor: '#DDD',
-          padding: '0.5rem',
+          padding: '0.5rem 1rem',
         }}
       >
         <h1 style={{ marginBottom: '0.5rem' }}>
@@ -45,7 +45,8 @@ function JobList() {
             style={{
               padding: '0.5rem',
               margin: '0.25rem',
-              border: '1px solid gray',
+              border: '2px solid #DDD',
+              borderRadius: '0.5rem',
             }}
           >
             <Job jobId={jobId} />
@@ -65,7 +66,14 @@ function Job({ jobId }: JobProps) {
   return (
     <>
       <h3>{latest.title}</h3>
-      <h4>{latest.location}</h4>
+      <h4
+        style={{
+          margin: '0 -0.5rem 0.125rem -0.5rem',
+          padding: '0 0.5rem 0.125rem 0.5rem',
+        }}
+      >
+        {latest.location}
+      </h4>
       <ShowHide
         content={latest.descriptionTeaser}
         display="block"
@@ -114,10 +122,8 @@ function ShowHide({
       <div
         style={{
           display,
-          borderTop: '1px solid gray',
-          borderBottom: '1px solid gray',
-          margin: '0.5rem -0.5rem',
-          padding: '0.5rem',
+          margin: '0.125rem -0.5rem',
+          padding: '0.125rem 0.5rem',
         }}
         dangerouslySetInnerHTML={{ __html: content }}
       />
