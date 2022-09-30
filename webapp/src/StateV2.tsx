@@ -68,22 +68,13 @@ export function Provider({ children }: React.PropsWithChildren) {
   const [filter, setFilter] = useState<string>('')
   const [error, setError] = useState<string>()
   useEffect(() => {
-    fetch('https://microsoft-careers-scraper-api.cruftbusters.com').then(
-      async (response) => setState(await response.json()),
-      setError,
-    )
-  }, [])
-  useEffect(() => {
     axios
       .get('https://microsoft-careers-scraper-api.cruftbusters.com', {
         params: new URLSearchParams({
           filter,
         }),
       })
-      .then(
-        (response: any) => setState(JSON.parse(response.data)),
-        setError,
-      )
+      .then((response: any) => setState(response.data), setError)
   }, [filter])
   return error ? (
     <div>state v2 provider error: ${error}</div>
