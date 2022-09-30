@@ -10,9 +10,10 @@ export default function App() {
 }
 
 function JobList() {
+  const [filter, setFilter] = useState('')
   const {
-    filter,
-    setFilter,
+    filter: contextFilter,
+    setFilter: setContextFilter,
     state: { touches },
   } = useContext(context)
   return (
@@ -30,7 +31,14 @@ function JobList() {
         <input
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
+          onKeyDown={(e) => e.code === 'Enter' && setContextFilter(filter)}
         />
+        <button onClick={() => setContextFilter(filter)}>search</button>
+        <div style={{ color: '#555', fontSize: '0.875rem' }}>
+          {contextFilter
+            ? `showing results for ${contextFilter}`
+            : 'showing all results'}
+        </div>
       </div>
       <div
         style={{
