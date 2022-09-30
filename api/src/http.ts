@@ -9,8 +9,9 @@ const http = (engine: Engine, touchmaster: Touchmaster) => {
 
   http.get('/', async (request, response) => {
     try {
-      response.json(await touchmaster({ count: 100 }))
-    } catch (e: any) {
+      const filter = request.query.filter?.toString().toLowerCase() || ''
+      response.json(await touchmaster({ count: 100, filter }))
+    } catch (e:any) {
       response.status(500).json({ message: e.message })
     }
   })
@@ -20,7 +21,7 @@ const http = (engine: Engine, touchmaster: Touchmaster) => {
       const searchPayload: SearchPayload = request.body
       await engine.post(searchPayload.eagerLoadRefineSearch.data.jobs)
       response.sendStatus(200)
-    } catch (e: any) {
+    } catch (e:any) {
       response.status(500).json({ message: e.message })
     }
   })

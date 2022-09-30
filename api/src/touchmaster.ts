@@ -1,21 +1,31 @@
 import { Job, StateV2 } from './types'
 
-type TouchmasterProps = { count: number }
+type TouchmasterProps = { count: number; filter: string }
 export type Touchmaster = (props: TouchmasterProps) => Promise<StateV2>
 export function newTouchmaster(
   getStateV2: () => Promise<StateV2>,
 ): Touchmaster {
-  return async ({ count }) => {
+  return async ({ count, filter }) => {
     const state = await getStateV2()
-    const touches = state.touches.slice(-count)
+    const filteredTouches =
+      filter === ''
+        ? state.touches
+        : state.touches.filter(
+            (jobId) =>
+              state.buckets[jobId].latest.location
+                .toLowerCase()
+                .indexOf(filter) > -1,
+          )
+    const slicedTouches = filteredTouches.slice(-count)
+
     return {
-      buckets: touches.reduce(
+      buckets: slicedTouches.reduce(
         (record, jobId) =>
           Object.assign(record, { [jobId]: state.buckets[jobId] }),
         {} as Record<string, { latest: Job }>,
       ),
-      offset: Math.max(0, state.touches.length - count),
-      touches,
+      offset: Math.max(0, filteredTouches.length - count),
+      touches: slicedTouches,
     }
   }
 }

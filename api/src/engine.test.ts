@@ -16,7 +16,7 @@ describe('engine', () => {
     expect(actual).toStrictEqual(expected)
   })
   test('add job', async () => {
-    const job = { jobId: 'new job' }
+    const job = { jobId: 'new job', location: '' }
     await (await newEngine(database)).post([job])
     const actual = await (await newEngine(database)).get()
     const expected: StateV2 = {
@@ -31,7 +31,7 @@ describe('engine', () => {
     expect(actual).toStrictEqual(expected)
   })
   test('add duplicate job results in no touch', async () => {
-    const job = { jobId: 'new job' }
+    const job = { jobId: 'new job', location: '' }
     await (await newEngine(database)).post([job])
     await (await newEngine(database)).post([job])
     const actual = await (await newEngine(database)).get()

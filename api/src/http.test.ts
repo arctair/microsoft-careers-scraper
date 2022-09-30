@@ -18,10 +18,15 @@ describe('http v2', () => {
       touches: ['1'],
     }
     touchmaster.mockResolvedValueOnce(state)
-    const response = await request.get('/')
+    const response = await request.get('/', {
+      params: new URLSearchParams({ filter: 'The Filter' }),
+    })
     expect(response.status).toBe(200)
     expect(response.data).toStrictEqual<StateV2>(state)
-    expect(touchmaster).toHaveBeenCalledWith({ count: 100 })
+    expect(touchmaster).toHaveBeenCalledWith({
+      count: 100,
+      filter: 'the filter',
+    })
   })
   test('get / returns error', async () => {
     touchmaster.mockRejectedValueOnce(new Error('another message'))
@@ -32,7 +37,7 @@ describe('http v2', () => {
   test('post / with search payload proxies jobs to engine', async () => {
     engine.post.mockReturnValueOnce(Promise.resolve())
 
-    const jobs = [{ jobId: 'the job!!!!!!' }]
+    const jobs = [{ jobId: 'the job!!!!!!', location: '' }]
     const searchPayload: SearchPayload = {
       eagerLoadRefineSearch: { data: { jobs } },
     }

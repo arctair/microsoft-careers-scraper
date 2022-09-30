@@ -1,5 +1,6 @@
 export interface Job {
   jobId: string
+  location: string
 }
 
 export interface SearchPayload {
