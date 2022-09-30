@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react'
+import axios from 'axios'
 
 type StateV2 = {
   buckets: Record<string, { latest: Job }>
@@ -64,7 +65,7 @@ export const context = createContext<{
 
 export function Provider({ children }: React.PropsWithChildren) {
   const [state, setState] = useState<StateV2>(defaultState)
-  const [filter, setFilter] = useState<string>()
+  const [filter, setFilter] = useState<string>('')
   const [error, setError] = useState<string>()
   useEffect(() => {
     fetch('https://microsoft-careers-scraper-api.cruftbusters.com').then(
@@ -72,6 +73,18 @@ export function Provider({ children }: React.PropsWithChildren) {
       setError,
     )
   }, [])
+  useEffect(() => {
+    axios
+      .get('https://microsoft-careers-scraper-api.cruftbusters.com', {
+        params: new URLSearchParams({
+          filter,
+        }),
+      })
+      .then(
+        (response: any) => setState(JSON.parse(response.data)),
+        setError,
+      )
+  }, [filter])
   return error ? (
     <div>state v2 provider error: ${error}</div>
   ) : (
