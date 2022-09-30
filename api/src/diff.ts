@@ -1,5 +1,5 @@
 import { diffLines } from 'diff'
-import { Job } from './state'
+import { Job } from './types'
 
 export default function diff(j0: Job, j1: Job): string {
   return diffLines(
