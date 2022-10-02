@@ -57,17 +57,22 @@ const defaultState: StateV2 = {
 }
 export const context = createContext<{
   filter: string | undefined
+  readMark: number
   setFilter: (filter: string) => void
+  setReadMark: (readMark: number) => void
   state: StateV2
 }>({
   filter: undefined,
+  readMark: 0,
   setFilter: () => {},
+  setReadMark: () => {},
   state: defaultState,
 })
 
 export function Provider({ children }: React.PropsWithChildren) {
   const [state, setState] = useState<StateV2>(defaultState)
   const [filter, setFilter] = useState<string>('')
+  const [readMark, setReadMark] = useState<number>(-1)
   const [error, setError] = useState<string>()
   useEffect(() => {
     axios
@@ -85,7 +90,9 @@ export function Provider({ children }: React.PropsWithChildren) {
       children={children}
       value={{
         filter,
+        readMark,
         setFilter,
+        setReadMark,
         state: {
           buckets: state.buckets,
           offset: state.offset,

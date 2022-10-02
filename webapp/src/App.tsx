@@ -14,7 +14,7 @@ function JobList() {
   const {
     filter: contextFilter,
     setFilter: setContextFilter,
-    state: { touches },
+    state: { offset, touches },
   } = useContext(context)
   return (
     <>
@@ -48,16 +48,8 @@ function JobList() {
         }}
       >
         {touches.map((jobId, index) => (
-          <div
-            key={index}
-            style={{
-              padding: '0.5rem',
-              margin: '0.25rem',
-              border: '2px solid #DDD',
-              borderRadius: '0.5rem',
-            }}
-          >
-            <Job jobId={jobId} />
+          <div key={index} style={{}}>
+            <Job jobId={jobId} touchIndex={offset + index} />
           </div>
         ))}
       </div>
@@ -65,15 +57,36 @@ function JobList() {
   )
 }
 
-type JobProps = { jobId: string }
-function Job({ jobId }: JobProps) {
+type JobProps = { jobId: string; touchIndex: number }
+function Job({ jobId, touchIndex }: JobProps) {
   const {
+    readMark,
+    setReadMark,
     state: { buckets },
   } = useContext(context)
   const { latest } = buckets[jobId]
   return (
-    <>
-      <h3>{latest.title}</h3>
+    <div
+      style={{
+        padding: '0.5rem',
+        margin: '0.25rem',
+        border: `2px solid #ddd`,
+        borderRadius: '0.5rem',
+      }}
+    >
+      <h3>
+        {latest.title}{' '}
+        <div
+          style={{
+            backgroundColor: 'yellow',
+            padding: '0 0.25rem',
+            fontSize: '1rem',
+            display: touchIndex > readMark ? 'inline-block' : 'none',
+          }}
+        >
+          new!
+        </div>
+      </h3>
       <h4
         style={{
           margin: '0 -0.5rem 0.125rem -0.5rem',
@@ -97,8 +110,17 @@ function Job({ jobId }: JobProps) {
         content={latest.jobQualifications}
         label="job qualifications"
       />
+      <button
+        onClick={() => setReadMark(touchIndex)}
+        style={{
+          color: 'black',
+          border: 'none',
+        }}
+      >
+        mark as latest
+      </button>
       <span style={{ display: 'none' }}>{JSON.stringify(latest)}</span>
-    </>
+    </div>
   )
 }
 
