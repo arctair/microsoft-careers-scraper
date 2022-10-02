@@ -3,6 +3,7 @@ import axios from 'axios'
 
 type StateV2 = {
   buckets: Record<string, { latest: Job }>
+  offset: number
   touches: string[]
 }
 
@@ -51,6 +52,7 @@ type Job = {
 
 const defaultState: StateV2 = {
   buckets: {},
+  offset: 0,
   touches: [],
 }
 export const context = createContext<{
@@ -86,6 +88,7 @@ export function Provider({ children }: React.PropsWithChildren) {
         setFilter,
         state: {
           buckets: state.buckets,
+          offset: state.offset,
           touches: filter
             ? state.touches.filter(
                 (jobId) =>
